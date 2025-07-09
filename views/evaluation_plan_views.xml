@@ -1,0 +1,545 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- VISTA KANBAN - PRINCIPAL -->
+        <record id="view_evaluation_plan_kanban" model="ir.ui.view">
+            <field name="name">evaluation.plan.kanban</field>
+            <field name="model">evaluation.plan</field>
+            <field name="arch" type="xml">
+                <kanban default_group_by="stage" 
+                        class="o_kanban_small_column" 
+                        group_create="false" 
+                        group_delete="false" 
+                        group_edit="false"
+                        quick_create="false">
+                    
+                    <!-- Campos necesarios para la vista -->
+                    <field name="id"/>
+                    <field name="title"/>
+                    <field name="risk_id"/>
+                    <field name="assigned_to"/>
+                    <field name="start_date"/>
+                    <field name="due_date"/>
+                    <field name="stage"/>
+                    <field name="priority"/>
+                    <field name="progress"/>
+                    <field name="days_to_due"/>
+                    <field name="is_overdue"/>
+                    <field name="color"/>
+                    
+                    <!-- Barra de progreso por etapas -->
+                    <progressbar field="priority" 
+                                colors='{"0": "success", "1": "success", "2": "warning", "3": "danger"}'/>
+                    
+                    <templates>
+                        <t t-name="kanban-box">
+                            <!-- Contenedor principal de la tarjeta con color dinámico -->
+                            <div t-attf-class="oe_kanban_color_#{kanban_getcolor(record.color.raw_value)} oe_kanban_card oe_kanban_global_click">
+                                
+                                <!-- Indicador de vencimiento -->
+                                <div class="ribbon ribbon-top-right" t-if="record.is_overdue.raw_value and record.stage.raw_value != 'completed'">
+                                    <span class="bg-danger">Vencido</span>
+                                </div>
+                                
+                                <div class="oe_kanban_content">
+                                    
+                                    <!-- Encabezado de la tarjeta -->
+                                    <div class="o_kanban_record_top">
+                                        <div class="o_kanban_record_headings">
+                                            <strong class="o_kanban_record_title">
+                                                <field name="title"/>
+                                            </strong>
+                                            <br/>
+                                            <span class="o_kanban_record_subtitle text-muted">
+                                                <i class="fa fa-exclamation-triangle"/> 
+                                                <field name="risk_id"/>
+                                            </span>
+                                        </div>
+                                        
+                                        <!-- Menú de acciones -->
+                                        <div class="o_kanban_manage_button_section">
+                                            <a class="o_kanban_manage_toggle_button" href="#">
+                                                <i class="fa fa-ellipsis-v" role="img" aria-label="Gestionar" title="Gestionar"/>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Cuerpo de la tarjeta -->
+                                    <div class="o_kanban_record_body">
+                                        
+                                        <!-- Información de fechas -->
+                                        <div class="row mb-2">
+                                            <div class="col-6">
+                                                <span class="fa fa-calendar-check-o text-success"/> 
+                                                <small><field name="start_date"/></small>
+                                            </div>
+                                            <div class="col-6">
+                                                <span t-attf-class="fa fa-calendar #{record.is_overdue.raw_value ? 'text-danger' : 'text-muted'}"/> 
+                                                <small t-attf-class="#{record.is_overdue.raw_value ? 'text-danger' : ''}">
+                                                    <field name="due_date"/>
+                                                </small>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Barra de progreso -->
+                                        <div class="mb-2">
+                                            <div class="progress" style="height: 6px;">
+                                                <div class="progress-bar" 
+                                                     t-attf-style="width: #{record.progress.raw_value}%;"
+                                                     t-attf-class="progress-bar-#{record.stage.raw_value == 'completed' ? 'success' : (record.stage.raw_value == 'in_progress' ? 'info' : 'secondary')}">
+                                                </div>
+                                            </div>
+                                            <small class="text-muted">
+                                                <field name="progress"/>% completado
+                                            </small>
+                                        </div>
+                                        
+                                        <!-- Badges de prioridad y días restantes -->
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span t-attf-class="badge badge-pill badge-#{record.priority.raw_value == '3' and 'danger' or (record.priority.raw_value == '2' and 'warning' or (record.priority.raw_value == '1' and 'info' or 'success'))}">
+                                                <t t-if="record.priority.raw_value == '0'">Baja</t>
+                                                <t t-if="record.priority.raw_value == '1'">Normal</t>
+                                                <t t-if="record.priority.raw_value == '2'">Alta</t>
+                                                <t t-if="record.priority.raw_value == '3'">Crítica</t>
+                                            </span>
+                                            
+                                            <small t-attf-class="#{record.is_overdue.raw_value ? 'text-danger' : 'text-muted'}">
+                                                <t t-if="record.days_to_due.raw_value > 0">
+                                                    <field name="days_to_due"/> días restantes
+                                                </t>
+                                                <t t-if="record.days_to_due.raw_value == 0">
+                                                    Vence hoy
+                                                </t>
+                                                <t t-if="record.days_to_due.raw_value &lt; 0">
+                                                    <field name="days_to_due"/> días de retraso
+                                                </t>
+                                            </small>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Pie de la tarjeta -->
+                                    <div class="o_kanban_record_bottom">
+                                        <div class="oe_kanban_bottom_left">
+                                            <field name="assigned_to" widget="many2one_avatar_user"/>
+                                        </div>
+                                        <div class="oe_kanban_bottom_right">
+                                            <span class="fa fa-clock-o"/> 
+                                            <field name="start_date"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Menú desplegable de acciones -->
+                                <div class="o_kanban_manage_button_section" style="display: none;">
+                                    <a type="edit" class="btn btn-primary btn-sm">Editar</a>
+                                    <a name="action_start_progress" type="object" 
+                                       class="btn btn-info btn-sm"
+                                       t-if="record.stage.raw_value == 'todo'">Iniciar</a>
+                                    <a name="action_complete" type="object" 
+                                       class="btn btn-success btn-sm"
+                                       t-if="record.stage.raw_value != 'completed'">Completar</a>
+                                    <a type="delete" class="btn btn-secondary btn-sm">Eliminar</a>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- =============================
+             VISTA TREE (LISTA)
+             ============================= -->
+        <record id="view_evaluation_plan_tree" model="ir.ui.view">
+            <field name="name">evaluation.plan.tree</field>
+            <field name="model">evaluation.plan</field>
+            <field name="arch" type="xml">
+                <tree string="Planes de Evaluación"                       >
+                      
+                    <!-- Campos principales -->
+                    <field name="title"/>
+                    <field name="risk_id"/>
+                    <field name="assigned_to" widget="many2one_avatar_user"/>
+                                      
+                                       
+                    
+                    <!-- Prioridad -->
+                    <field name="priority" widget="priority"/>
+
+                    
+                    <!-- Días restantes -->
+                    <field name="due_date" 
+                           decoration-danger="due_date &lt; context_today() and stage != 'completed'"
+                           decoration-warning="due_date &lt;= (context_today() + datetime.timedelta(days=3)).strftime('%Y-%m-%d') and due_date &gt;= context_today() and stage != 'completed'"/>
+                    
+                    <!-- Estado y progreso -->
+                    <field name="stage" widget="badge" />
+                    
+                    <field name="progress" widget="progressbar"/>
+                    <!-- Campos ocultos para decoraciones -->
+                    <field name="days_to_due" column_invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- =============================
+             VISTA FORM (FORMULARIO)
+             ============================= -->
+        <record id="view_evaluation_plan_form" model="ir.ui.view">
+            <field name="name">evaluation.plan.form</field>
+            <field name="model">evaluation.plan</field>
+            <field name="arch" type="xml">
+                <form string="Plan de Evaluación">
+                    
+                    <!-- Encabezado con botones de acción -->
+                    <header>
+                        <!-- Botones según la etapa actual -->
+                        <button name="action_start_progress" type="object" 
+                                string="Iniciar Progreso" 
+                                class="btn-info"
+                                invisible="stage != 'todo'"/>
+                        
+                        <button name="action_complete" type="object" 
+                                string="Completar" 
+                                class="btn-success"
+                                invisible="stage == 'completed'"/>
+                        
+                        <button name="action_reset_to_todo" type="object" 
+                                string="Reiniciar" 
+                                class="btn-warning"
+                                invisible="stage == 'todo'"
+                                confirm="¿Está seguro de reiniciar este plan a 'Por hacer'?"/>
+                        
+                        <!-- Barra de estado -->
+                        <field name="stage" widget="statusbar" 
+                               statusbar_visible="todo,in_progress,completed"/>
+                    </header>
+                    
+                    <sheet>
+                        <!-- Alertas -->
+                        <div class="alert alert-danger" role="alert" invisible="due_date &gt;= context_today() or stage == 'completed'">
+                            <strong>¡Plan Vencido!</strong> Este plan de evaluación está vencido.
+                        </div>
+                        
+                        <div class="alert alert-warning" role="alert" invisible="due_date &gt; (context_today() + datetime.timedelta(days=3)).strftime('%Y-%m-%d') or due_date &lt; context_today() or stage == 'completed'">
+                            <strong>¡Próximo a Vencer!</strong> Este plan vence pronto.
+                        </div>
+                        
+                        <!-- Título principal -->
+                        <div class="oe_title">
+                            <div class="oe_edit_only">
+                                <label for="title"/>
+                            </div>
+                            <h1>
+                                <field name="title" placeholder="Título del plan de evaluación..."/>
+                            </h1>
+                        </div>
+                        
+                        <!-- Información principal -->
+                        <group>
+                            <group>
+                                <field name="risk_id" 
+                                       options="{'no_create': True, 'no_create_edit': True}"/>
+                                <field name="assigned_to"/>
+                                <field name="priority" widget="priority"/>
+                            </group>
+                            <group>
+                                <field name="start_date"/>
+                                <field name="due_date"/>
+                                <field name="progress" widget="progressbar" readonly="1"/>
+                            </group>
+                        </group>
+                        
+                        <!-- Descripción -->
+                        <group string="Descripción">
+                            <field name="description" 
+                                   nolabel="2" 
+                                   placeholder="Descripción detallada del plan de evaluación y las actividades a realizar..."/>
+                        </group>
+                        
+                        <!-- Notebook con información adicional -->
+                        <notebook>
+                            <!-- Pestaña de Actividades -->
+<page string="Actividades" name="activities">
+    <group>
+        <group>
+            <field name="task_count" readonly="1"/>
+            
+        </group>
+                <group>
+            
+            <field name="tasks_done_count" readonly="1"/>
+        </group>
+    </group>
+    
+    <field name="task_ids" nolabel="1">
+        <tree string="Tareas" editable="bottom">
+            
+            <!-- Handle para reordenar -->
+            <field name="sequence" widget="handle"/>
+            
+            <!-- Campos principales -->
+            <field name="name" required="1"/>
+            <field name="description"/>
+            <field name="responsible_id"/>
+            
+            <!-- Fechas y estado -->
+            <field name="date_deadline"/>
+            <field name="state"/>
+            
+            <!-- Progreso -->
+            <field name="progress" widget="progressbar"/>
+            
+            <!-- Campos ocultos para funcionalidad -->
+            <field name="is_overdue" column_invisible="1"/>
+            <field name="days_to_deadline" column_invisible="1"/>
+            
+            <!-- Botones de acción -->
+            <button name="action_start" type="object" 
+                    icon="fa-play" 
+                    title="Iniciar"
+                    invisible="state != 'pending'"/>
+            <button name="action_done" type="object" 
+                    icon="fa-check" 
+                    title="Completar"
+                    invisible="state in ['done', 'cancelled']"/>
+            <button name="action_cancel" type="object" 
+                    icon="fa-times" 
+                    title="Cancelar"
+                    invisible="state in ['done', 'cancelled']"/>
+            <button name="action_reset" type="object" 
+                    icon="fa-refresh" 
+                    title="Reiniciar"
+                    invisible="state not in ['done', 'cancelled']"/>
+        </tree>
+        
+        <!-- Vista formulario para edición de tareas -->
+        <form string="Tarea">
+            <header>
+                <button name="action_start" type="object" 
+                        string="Iniciar" 
+                        class="btn-info"
+                        invisible="state != 'pending'"/>
+                <button name="action_done" type="object" 
+                        string="Completar" 
+                        class="btn-success"
+                        invisible="state in ['done', 'cancelled']"/>
+                <button name="action_cancel" type="object" 
+                        string="Cancelar" 
+                        class="btn-danger"
+                        invisible="state in ['done', 'cancelled']"/>
+                <button name="action_reset" type="object" 
+                        string="Reiniciar" 
+                        class="btn-warning"
+                        invisible="state not in ['done', 'cancelled']"/>
+                <field name="state" widget="statusbar" 
+                       statusbar_visible="pending,in_progress,done"/>
+            </header>
+            <sheet>
+                <group>
+                    <group>
+                        <field name="name"/>
+                        <field name="responsible_id"/>
+                    </group>
+                    <group>
+                        <field name="date_deadline"/>
+                        <field name="date_done" readonly="1" invisible="not date_done"/>
+                        <field name="progress" widget="progressbar"/>
+                    </group>
+                </group>
+                <group string="Descripción">
+                    <field name="description" nolabel="2" 
+                           placeholder="Descripción detallada de la tarea..."/>
+                </group>
+            </sheet>
+        </form>
+    </field>
+</page>
+
+                            <!-- Pestaña de Información del Sistema -->
+                            <page string="Información del Sistema">
+                                <group>
+                                    <group string="Fechas del Sistema">
+                                        <field name="create_date" readonly="1"/>
+                                        <field name="write_date" readonly="1"/>
+                                    </group>
+                                    <group string="Usuarios del Sistema">
+                                        <field name="create_uid" readonly="1"/>
+                                        <field name="write_uid" readonly="1"/>
+                                    </group>
+                                </group>
+                                
+                                <group>
+                                    <group string="Control">
+                                        <field name="active"/>
+                                        <field name="company_id" 
+                                               options="{'no_create': True}" 
+                                               groups="base.group_multi_company"/>
+                                    </group>
+                                    <group string="Cálculos">
+                                        <field name="days_to_due" readonly="1"/>
+                                        <field name="is_overdue" readonly="1"/>
+                                    </group>
+                                </group>
+                            </page>
+                            
+                        </notebook>
+                    </sheet>
+                    
+                    <!-- Chatter para seguimiento y comunicación -->
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread" options="{'post_refresh': 'recipients'}"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- =============================
+             VISTA SEARCH (BÚSQUEDA)
+             ============================= -->
+        <record id="view_evaluation_plan_search" model="ir.ui.view">
+            <field name="name">evaluation.plan.search</field>
+            <field name="model">evaluation.plan</field>
+            <field name="arch" type="xml">
+                <search string="Buscar Planes de Evaluación">
+                    
+                    <!-- Campos de búsqueda -->
+                    <field name="title" string="Título"/>
+                    <field name="risk_id" string="Riesgo"/>
+                    <field name="assigned_to" string="Asignado a"/>
+                    <field name="description" string="Descripción"/>
+                    
+                    <!-- Filtros principales -->
+                    <filter string="Mis Planes" name="my_plans" 
+                            domain="[('assigned_to', '=', uid)]"/>
+                    
+                    <filter string="Planes Activos" name="active_plans" 
+                            domain="[('active', '=', True)]"/>
+                    
+                    <separator/>
+                    
+                    <!-- Filtros por etapa -->
+                    <filter string="Por Hacer" name="todo" 
+                            domain="[('stage', '=', 'todo')]"/>
+                    <filter string="En Progreso" name="in_progress" 
+                            domain="[('stage', '=', 'in_progress')]"/>
+                    <filter string="Completadas" name="completed" 
+                            domain="[('stage', '=', 'completed')]"/>
+                    
+                    <separator/>
+                    
+                    <!-- Filtros por estado temporal -->
+                    <filter string="Vencidos" name="overdue" 
+                            domain="[('due_date', '&lt;', context_today()), ('stage', '!=', 'completed')]"/>
+                    <filter string="Próximos a Vencer" name="due_soon" 
+                            domain="[('due_date', '&lt;=', (context_today() + datetime.timedelta(days=7)).strftime('%Y-%m-%d')), ('due_date', '&gt;=', context_today()), ('stage', '!=', 'completed')]"/>
+                    <filter string="Vencen Hoy" name="due_today" 
+                            domain="[('due_date', '=', context_today()), ('stage', '!=', 'completed')]"/>
+                    
+                    <separator/>
+                    
+                    <!-- Filtros por prioridad -->
+                    <filter string="Prioridad Crítica" name="critical_priority" 
+                            domain="[('priority', '=', '3')]"/>
+                    <filter string="Prioridad Alta" name="high_priority" 
+                            domain="[('priority', '=', '2')]"/>
+                    <filter string="Prioridad Normal" name="normal_priority" 
+                            domain="[('priority', '=', '1')]"/>
+                    
+                    <separator/>
+                    
+                    <!-- Filtros por fechas -->
+                    <filter string="Esta Semana" name="this_week"
+                            domain="[('start_date', '&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
+                                     ('start_date', '&lt;=', (context_today() + datetime.timedelta(days=6-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                    <filter string="Este Mes" name="this_month"
+                            domain="[('start_date', '&gt;=', context_today().strftime('%Y-%m-01'))]"/>
+                    
+                    <!-- Agrupaciones -->
+                    <group expand="0" string="Agrupar por">
+                        <filter string="Etapa" name="group_by_stage" 
+                                context="{'group_by': 'stage'}"/>
+                        <filter string="Asignado a" name="group_by_assigned" 
+                                context="{'group_by': 'assigned_to'}"/>
+                        <filter string="Riesgo" name="group_by_risk" 
+                                context="{'group_by': 'risk_id'}"/>
+                        <filter string="Prioridad" name="group_by_priority" 
+                                context="{'group_by': 'priority'}"/>
+                        <filter string="Fecha de Inicio" name="group_by_start_date" 
+                                context="{'group_by': 'start_date'}"/>
+                        <filter string="Fecha de Vencimiento" name="group_by_due_date" 
+                                context="{'group_by': 'due_date'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- =============================
+             ACCIONES DE VENTANA
+             ============================= -->
+        
+        <!-- Acción principal para todos los planes -->
+        <record id="action_evaluation_plan" model="ir.actions.act_window">
+            <field name="name">Planes de Evaluación</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">evaluation.plan</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="context">{'search_default_active_plans': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    ¡Crea tu primer plan de evaluación!
+                </p>
+                <p>
+                    Los planes de evaluación te permiten organizar y dar seguimiento a las 
+                    actividades necesarias para evaluar los riesgos identificados en tu empresa.
+                </p>
+                <p>
+                    Utiliza las diferentes etapas (Por hacer, En progreso, Completada) para 
+                    mantener un control efectivo del progreso de cada plan.
+                </p>
+            </field>
+        </record>
+
+        <!-- Acción para "Mis Planes" -->
+        <record id="action_my_evaluation_plan" model="ir.actions.act_window">
+            <field name="name">Mis Planes de Evaluación</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">evaluation.plan</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="domain">[('assigned_to', '=', uid)]</field>
+            <field name="context">{'search_default_my_plans': 1, 'search_default_active_plans': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    ¡No tienes planes de evaluación asignados!
+                </p>
+                <p>
+                    Los planes de evaluación que te sean asignados aparecerán aquí 
+                    para que puedas gestionarlos de manera eficiente.
+                </p>
+            </field>
+        </record>
+
+        <!-- Acción para planes vencidos -->
+        <record id="action_overdue_evaluation_plan" model="ir.actions.act_window">
+            <field name="name">Planes Vencidos</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">evaluation.plan</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="domain">[('due_date', '&lt;', context_today()), ('stage', '!=', 'completed')]</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    ¡No hay planes vencidos!
+                </p>
+                <p>
+                    Los planes de evaluación que hayan superado su fecha de vencimiento 
+                    sin ser completados aparecerán aquí para que puedas tomar acción inmediata.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

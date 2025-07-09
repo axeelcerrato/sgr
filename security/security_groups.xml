@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- =============================
+             CATEGORÍA DE ACCESO
+             ============================= -->
+        <record id="category_risk_management" model="ir.module.category">
+            <field name="name">Gestión de Riesgos</field>
+            <field name="description">Categoría para permisos del módulo de Gestión de Riesgos</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <!-- =============================
+             GRUPOS DE USUARIOS
+             ============================= -->
+        
+        <!-- Usuario de Riesgos (Básico) -->
+        <record id="group_risk_user" model="res.groups">
+            <field name="name">Usuario de Riesgos</field>
+            <field name="category_id" ref="category_risk_management"/>
+            <field name="comment">
+                Permisos básicos para usuarios de riesgos:
+                - Lectura: Todos los registros
+                - Crear: Nuevos registros
+                - Editar: Solo registros propios
+                - Eliminar: Ninguno
+                - Visibilidad: Solo registros creados por el usuario
+            </field>
+        </record>
+
+        <!-- Gestor de Riesgos (Administrador) -->
+        <record id="group_risk_manager" model="res.groups">
+            <field name="name">Gestor de Riesgos</field>
+            <field name="category_id" ref="category_risk_management"/>
+            <field name="implied_ids" eval="[(4, ref('group_risk_user'))]"/>
+            <field name="comment">
+                Permisos completos para gestores de riesgos:
+                - Lectura: Todos los registros
+                - Crear: Nuevos registros
+                - Editar: Todos los registros
+                - Eliminar: Todos los registros
+                - Visibilidad: Todos los registros del sistema
+                - Configuración: Acceso a categorías y configuración
+            </field>
+        </record>
+
+    </data>
+</odoo>

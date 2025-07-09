@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Categoría demo para el dashboard -->
+        <record id="demo_category_operational" model="risk.category">
+            <field name="name">Operacional</field>
+            <field name="active">True</field>
+        </record>
+    </data>
+</odoo>

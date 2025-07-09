@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- =============================
+             PLANTILLA PDF CORREGIDA (ESTILO ORIGINAL)
+             ============================= -->
+        <template id="report_risk_management_document">
+            <t t-call="web.external_layout">
+                <t t-foreach="docs" t-as="o">
+                    <div class="page">
+                        
+                        <!-- Encabezado del Reporte -->
+                        <div class="text-center mb-4">
+                            <h2 class="mt-0 mb-2">
+                                <strong>REPORTE DE RIESGO</strong>
+                            </h2>
+                            <h4 class="text-muted">
+                                <span t-field="o.request_number"/>
+                            </h4>
+                            <hr/>
+                        </div>
+                        
+                        <!-- Información Principal -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h4 class="mb-3">
+                                    <i class="fa fa-info-circle"/> Información General
+                                </h4>
+                                
+                                <table class="table table-borderless">
+                                    <tbody>
+                                        <!-- Título -->
+                                        <tr>
+                                            <td class="font-weight-bold" style="width: 25%;">
+                                                <i class="fa fa-tag"/> Título:
+                                            </td>
+                                            <td style="width: 75%;">
+                                                <span t-field="o.title"/>
+                                            </td>
+                                        </tr>
+                                        
+                                        <!-- Categoría -->
+                                        <tr>
+                                            <td class="font-weight-bold">
+                                                <i class="fa fa-folder-o"/> Categoría:
+                                            </td>
+                                            <td>
+                                                <span t-field="o.category_id.name"/>
+                                            </td>
+                                        </tr>
+                                        
+                                        <!-- Fecha de Identificación -->
+                                        <tr>
+                                            <td class="font-weight-bold">
+                                                <i class="fa fa-calendar"/> Fecha de Identificación:
+                                            </td>
+                                            <td>
+                                                <span t-field="o.identification_date"/>
+                                            </td>
+                                        </tr>
+                                        
+                                        <!-- Responsable -->
+                                        <tr>
+                                            <td class="font-weight-bold">
+                                                <i class="fa fa-user"/> Responsable:
+                                            </td>
+                                            <td>
+                                                <span t-field="o.responsible_id.name"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Evaluación del Riesgo -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h4 class="mb-3">
+                                    <i class="fa fa-calculator"/> Evaluación del Riesgo
+                                </h4>
+                                
+                                <div class="row">
+                                    <!-- Columna Izquierda -->
+                                    <div class="col-6">
+                                        <table class="table table-borderless">
+                                            <tbody>
+                                <!-- Probabilidad CON VALORES - MEJORADO -->
+                                                <tr>
+                                                    <td class="font-weight-bold">
+                                                        <i class="fa fa-bar-chart"/> Probabilidad:
+                                                    </td>
+                                                    <td>
+                                                        <t t-if="o.probability == '1'">Muy Baja (1)</t>
+                                                        <t t-elif="o.probability == '2'">Baja (2)</t>
+                                                        <t t-elif="o.probability == '3'">Media (3)</t>
+                                                        <t t-elif="o.probability == '4'">Alta (4)</t>
+                                                        <t t-elif="o.probability == '5'">Muy Alta (5)</t>
+                                                        <t t-else="">
+                                                            <span t-if="o.probability" t-field="o.probability"/>
+                                                            <span t-if="not o.probability" class="text-muted">No definida</span>
+                                                        </t>
+                                                    </td>
+                                                </tr>
+                                                
+                                                <!-- Impacto CON VALORES - MEJORADO -->
+                                                <tr>
+                                                    <td class="font-weight-bold">
+                                                        <i class="fa fa-exclamation-triangle"/> Impacto:
+                                                    </td>
+                                                    <td>
+                                                        <t t-if="o.impact == '1'">Muy Bajo (1)</t>
+                                                        <t t-elif="o.impact == '2'">Bajo (2)</t>
+                                                        <t t-elif="o.impact == '3'">Medio (3)</t>
+                                                        <t t-elif="o.impact == '4'">Alto (4)</t>
+                                                        <t t-elif="o.impact == '5'">Muy Alto (5)</t>
+                                                        <t t-else="">
+                                                            <span t-if="o.impact" t-field="o.impact"/>
+                                                            <span t-if="not o.impact" class="text-muted">No definido</span>
+                                                        </t>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    <!-- Columna Derecha -->
+                                    <div class="col-6">
+                                        <table class="table table-borderless">
+                                            <tbody>
+                                                <!-- Puntuación -->
+                                                <tr>
+                                                    <td class="font-weight-bold">
+                                                        <i class="fa fa-tachometer"/> Puntuación:
+                                                    </td>
+                                                    <td>
+                                                        <span t-field="o.risk_score"/>%
+                                                    </td>
+                                                </tr>
+                                                
+                                                <!-- Nivel de Riesgo -->
+                                                <tr>
+                                                    <td class="font-weight-bold">
+                                                        <i class="fa fa-flag"/> Nivel de Riesgo:
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge badge-pill"
+                                                              t-attf-style="background-color: #{o.risk_level == 'critical' and '#dc3545' or (o.risk_level == 'high' and '#fd7e14' or (o.risk_level == 'medium' and '#ffc107' or '#28a745'))}; color: white;">
+                                                            <t t-if="o.risk_level == 'low'">🟢 Bajo</t>
+                                                            <t t-elif="o.risk_level == 'medium'">🟡 Medio</t>
+                                                            <t t-elif="o.risk_level == 'high'">🟠 Alto</t>
+                                                            <t t-elif="o.risk_level == 'critical'">🔴 Crítico</t>
+                                                            <t t-else=""><span t-field="o.risk_level"/></t>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Análisis del Riesgo -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h4 class="mb-3">
+                                    <i class="fa fa-search"/> Análisis del Riesgo
+                                </h4>
+                                
+                                <!-- Riesgo Inherente -->
+                                <div class="mb-4">
+                                    <h5 class="font-weight-bold text-primary">
+                                        <i class="fa fa-warning"/> Riesgo Inherente
+                                    </h5>
+                                       <td>
+                                                        <span class="badge badge-pill"
+                                                              t-attf-style="background-color: #{o.risk_level == 'critical' and '#dc3545' or (o.risk_level == 'high' and '#fd7e14' or (o.risk_level == 'medium' and '#ffc107' or '#28a745'))}; color: white;">
+                                                            <t t-if="o.risk_level == 'low'">🟢 Bajo</t>
+                                                            <t t-elif="o.risk_level == 'medium'">🟡 Medio</t>
+                                                            <t t-elif="o.risk_level == 'high'">🟠 Alto</t>
+                                                            <t t-elif="o.risk_level == 'critical'">🔴 Crítico</t>
+                                                            <t t-else=""><span t-field="o.risk_level"/></t>
+                                                        </span>
+                                                    </td>
+                                    
+                                </div>
+                                
+                                <!-- Riesgo Residual -->
+                                <div class="mb-4">
+                                    <h5 class="font-weight-bold text-success">
+                                        <i class="fa fa-shield"/> Riesgo Residual
+                                    </h5>
+                                    <td>
+                                                        <span class="badge badge-pill"
+                                                              t-attf-style="background-color: #{o.risk_level == 'critical' and '#dc3545' or (o.risk_level == 'high' and '#fd7e14' or (o.risk_level == 'medium' and '#ffc107' or '#28a745'))}; color: white;">
+                                                            <t t-if="o.risk_level == 'low'">🟢 Bajo</t>
+                                                            <t t-elif="o.risk_level == 'medium'">🟡 Medio</t>
+                                                            <t t-elif="o.risk_level == 'high'">🟠 Alto</t>
+                                                            <t t-elif="o.risk_level == 'critical'">🔴 Crítico</t>
+                                                            <t t-else=""><span t-field="o.risk_level"/></t>
+                                                        </span>
+                                                    </td>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Información Adicional -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h4 class="mb-3">
+                                    <i class="fa fa-info"/> Información Adicional
+                                </h4>
+                                
+                                <table class="table table-borderless">
+                                    <tbody>
+                                        <!-- Descripción (solo si existe) -->
+                                        <tr t-if="o.description">
+                                            <td class="font-weight-bold" style="width: 25%;">
+                                                <i class="fa fa-file-text-o"/> Descripción:
+                                            </td>
+                                            <td style="width: 75%;">
+                                                <div style="white-space: pre-wrap;">
+                                                    <span t-field="o.description"/>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        
+                                        <!-- Etapa Actual -->
+                                        <tr>
+                                            <td class="font-weight-bold">
+                                                <i class="fa fa-tasks"/> Etapa Actual:
+                                            </td>
+                                            <td>
+                                                <t t-if="o.stage == 'draft'">Borrador</t>
+                                                <t t-elif="o.stage == 'evaluated'">Evaluado</t>
+                                                <t t-elif="o.stage == 'treatment'">En Tratamiento</t>
+                                                <t t-elif="o.stage == 'closed'">Cerrado</t>
+                                                <t t-elif="o.stage == 'cancelled'">Cancelado</t>
+                                                <t t-else=""><span t-field="o.stage"/></t>
+                                            </td>
+                                        </tr>
+                                        
+                                        <!-- Creado por -->
+                                        <tr>
+                                            <td class="font-weight-bold">
+                                                <i class="fa fa-user-plus"/> Creado por:
+                                            </td>
+                                            <td>
+                                                <span t-field="o.created_by.name"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Pie del Reporte -->
+                        <div class="row mt-5">
+                            <div class="col-12 text-center">
+                                <hr/>
+                                <small class="text-muted">
+                                    Reporte generado el <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y a las %H:%M')"/>
+                                    por <span t-esc="user.name"/>
+                                </small>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </t>
+            </t>
+        </template>
+
+        <!-- =============================
+             PLANTILLA PRINCIPAL
+             ============================= -->
+        <template id="report_risk_management">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="sgr.report_risk_management_document"/>
+                </t>
+            </t>
+        </template>
+
+    </data>
+</odoo>

@@ -1,0 +1,85 @@
+.risk_matrix_container {
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    max-width: 700px;
+}
+
+.risk_matrix_container h4 {
+    color: #343a40;
+    margin-bottom: 20px;
+    font-weight: 600;
+    font-size: 18px;
+    text-align: center;
+}
+
+/* Contenedor principal de la matriz */
+.risk_matrix_container > div[style*="display: flex"] {
+    margin: 0 auto;
+    justify-content: center !important;
+}
+
+/* Grid de la matriz */
+.risk_matrix_container div[style*="display: grid"] {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    border-radius: 8px !important;
+    overflow: hidden;
+}
+
+/* Hover effects para celdas de la matriz */
+.risk_matrix_container div[title]:hover {
+    transform: scale(1.05) !important;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.3) !important;
+    z-index: 100 !important;
+    position: relative !important;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .risk_matrix_container {
+        margin: 10px;
+        padding: 15px;
+        max-width: 100%;
+    }
+    
+    .risk_matrix_container h4 {
+        font-size: 16px;
+    }
+    
+    .risk_matrix_container div[style*="grid-template-columns"] {
+        grid-template-columns: 60px repeat(5, 50px) !important;
+        grid-template-rows: 40px repeat(5, 50px) !important;
+        gap: 1px !important;
+    }
+    
+    .risk_matrix_container div[style*="display: flex"][style*="gap: 20px"] {
+        gap: 10px !important;
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+}
+
+/* Asegurar que la matriz esté centrada */
+.o_field_html .risk_matrix_container > div[style*="display: flex"] {
+    width: 100% !important;
+    justify-content: center !important;
+}
+
+/* Estilos para impresión */
+@media print {
+    .risk_matrix_container {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        border: 2px solid #000;
+        background: white !important;
+        box-shadow: none !important;
+    }
+    
+    .risk_matrix_container div[title]:hover {
+        transform: none !important;
+        box-shadow: none !important;
+    }
+}

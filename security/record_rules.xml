@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- =============================
+             REGLAS PARA GESTIÓN DE RIESGOS
+             ============================= -->
+        
+        <!-- Gestor de Riesgos: Acceso total -->
+        <record id="rule_risk_management_manager" model="ir.rule">
+            <field name="name">Gestores: Acceso Total a Riesgos</field>
+            <field name="model_id" ref="model_risk_management"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_risk_manager'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <!-- Usuario de Riesgos: Solo registros propios -->
+        <record id="rule_risk_management_user" model="ir.rule">
+            <field name="name">Usuarios: Solo Riesgos Propios</field>
+            <field name="model_id" ref="model_risk_management"/>
+            <field name="domain_force">[('create_uid', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_risk_user'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- =============================
+             REGLAS PARA PLAN DE EVALUACIÓN
+             ============================= -->
+        
+        <!-- Gestor de Riesgos: Acceso total -->
+        <record id="rule_evaluation_plan_manager" model="ir.rule">
+            <field name="name">Gestores: Acceso Total a Planes</field>
+            <field name="model_id" ref="model_evaluation_plan"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_risk_manager'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <!-- Usuario de Riesgos: Solo registros propios -->
+        <record id="rule_evaluation_plan_user" model="ir.rule">
+            <field name="name">Usuarios: Solo Planes Propios</field>
+            <field name="model_id" ref="model_evaluation_plan"/>
+            <field name="domain_force">[('create_uid', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_risk_user'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- =============================
+             REGLAS PARA CATEGORÍAS DE RIESGO
+             ============================= -->
+        
+        <!-- Gestor de Riesgos: Acceso total -->
+        <record id="rule_risk_category_manager" model="ir.rule">
+            <field name="name">Gestores: Acceso Total a Categorías</field>
+            <field name="model_id" ref="model_risk_category"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_risk_manager'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <!-- Usuario de Riesgos: Solo lectura -->
+        <record id="rule_risk_category_user" model="ir.rule">
+            <field name="name">Usuarios: Solo Lectura de Categorías</field>
+            <field name="model_id" ref="model_risk_category"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_risk_user'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- Menú Principal de Gestión de Riesgos -->
+        <menuitem id="menu_risk_management_root" 
+                  web_icon="sgr,static/description/icon.png"
+                  name="Gestión de Riesgos" 
+                  sequence="10"/>
+        
+        <!-- DASHBOARD - NUEVO -->
+   
+        <menuitem id="menu_risk_dashboard" 
+          name="Dashboard" 
+          parent="menu_risk_management_root"
+          action="action_risk_dashboard" 
+          sequence="1"/>
+        
+        <!-- ============================
+                             SUBMENÚ: RIESGOS
+        ============================= -->
+        <menuitem id="menu_risk_management_risks" 
+                  name="Riesgos" 
+                  parent="menu_risk_management_root" 
+                  sequence="10"/>
+        
+        <!-- Opción: Ver todos los riesgos -->
+        <menuitem id="menu_risk_management_all" 
+                  name="Todos los Riesgos" 
+                  parent="menu_risk_management_risks"
+                  action="action_risk_management" 
+                  sequence="10"/>
+        
+        <!-- Acción personalizada para "Mis Riesgos" -->
+        <record id="action_my_risk_management" model="ir.actions.act_window">
+            <field name="name">Mis Riesgos</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">risk.management</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="domain">[('responsible_id', '=', uid)]</field>
+            <field name="context">{'search_default_my_risks': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    ¡No tienes riesgos asignados!
+                </p>
+                <p>
+                    Los riesgos asignados a ti aparecerán aquí para que puedas gestionarlos eficientemente.
+                </p>
+            </field>
+        </record>
+        
+        <!-- =============================
+             SUBMENÚ: PLAN DE EVALUACIÓN (NUEVO)
+             ============================= -->
+        <menuitem id="menu_evaluation_plan" 
+                  name="Plan de Acción" 
+                  parent="menu_risk_management_root" 
+                  sequence="30"/>
+        
+        <!-- Opción: Todos los Planes -->
+        <menuitem id="menu_evaluation_plan_all" 
+                  name="Todos los Planes" 
+                  parent="menu_evaluation_plan"
+                  action="action_evaluation_plan" 
+                  sequence="10"/>
+        
+        <!-- Opción: Planes Vencidos -->
+        <menuitem id="menu_evaluation_plan_overdue" 
+                  name="Planes Vencidos" 
+                  parent="menu_evaluation_plan"
+                  action="action_overdue_evaluation_plan" 
+                  sequence="30"/>
+        
+        <!-- =============================
+             SUBMENÚ: CONFIGURACIÓN
+             ============================= -->
+        <menuitem id="menu_risk_management_config" 
+                  name="Configuración" 
+                  parent="menu_risk_management_root" 
+                  sequence="90"/>
+        
+        <!-- Opción: Categorías de Riesgo -->
+        <menuitem id="menu_risk_category" 
+                  name="Categorías de Riesgo" 
+                  parent="menu_risk_management_config"
+                  action="action_risk_category" 
+                  sequence="10"/>
+
+    </data>
+</odoo>

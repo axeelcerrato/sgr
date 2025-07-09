@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- =============================
+             ACCIÓN DEL REPORTE PDF
+             ============================= -->
+        <record id="action_report_risk_management" model="ir.actions.report">
+            <field name="name">Reporte de Riesgo</field>
+            <field name="model">risk.management</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">sgr.report_risk_management</field>
+            <field name="report_file">sgr.report_risk_management</field>
+            <field name="print_report_name">'Reporte_Riesgo_' + object.request_number</field>
+            <field name="binding_model_id" ref="model_risk_management"/>
+            <field name="binding_type">report</field>
+        </record>
+
+    </data>
+</odoo>

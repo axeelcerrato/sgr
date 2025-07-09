@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+<!-- Vista Kanban para Gestión de Riesgos - SIN ETAPAS -->
+<record id="view_risk_management_kanban" model="ir.ui.view">
+    <field name="name">risk.management.kanban</field>
+    <field name="model">risk.management</field>
+    <field name="arch" type="xml">
+        <kanban default_order="create_date desc" class="o_kanban_small_column">
+            <field name="color"/>
+            <field name="title"/>
+            <field name="request_number"/>
+            <field name="create_date"/>
+            <field name="responsible_id"/>
+            <field name="risk_level"/>
+            
+            <!-- Barra de progreso por nivel de riesgo -->
+            <progressbar field="risk_level" colors='{"low": "success", "medium": "warning", "high": "danger", "critical": "danger"}'/>
+            
+            <templates>
+                <t t-name="kanban-box">
+                    <div t-attf-class="oe_kanban_color_#{kanban_getcolor(record.color.raw_value)} oe_kanban_card oe_kanban_global_click">
+                        
+                        <div class="oe_kanban_content">
+                            <!-- Encabezado: Nombre del riesgo -->
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="title"/>
+                                    </strong>
+                                </div>
+                                <div class="o_kanban_manage_button_section">
+                                    <a class="o_kanban_manage_toggle_button" href="#">
+                                        <i class="fa fa-ellipsis-v" role="img" aria-label="Gestionar" title="Gestionar"/>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- Cuerpo: Código y fecha -->
+                            <div class="o_kanban_record_body">
+                                <div class="row mb-2">
+                                    <div class="col-12">
+                                        <strong><span class="fa fa-hashtag"/> <field name="request_number"/></strong>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-2">
+                                    <div class="col-12">
+                                        <span class="fa fa-calendar"/> <field name="create_date"/>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Footer: Responsable -->
+                            <div class="o_kanban_record_bottom">
+                                <div class="oe_kanban_bottom_left">
+                                    <field name="responsible_id" widget="many2one_avatar_employee"/>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <!-- Badge de nivel de riesgo -->
+                                    <span class="badge badge-pill" 
+                                        t-attf-class="badge-#{record.risk_level.raw_value == 'critical' and 'danger' or (record.risk_level.raw_value == 'high' and 'danger' or (record.risk_level.raw_value == 'medium' and 'warning' or 'success'))}">
+                                        <field name="risk_level"/>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Menú de gestión -->
+                        <div class="o_kanban_manage_button_section" style="display: none;">
+                            <a type="edit" class="btn btn-primary btn-sm">Editar</a>
+                            <a type="delete" class="btn btn-secondary btn-sm">Eliminar</a>
+                        </div>
+                    </div>
+                </t>
+            </templates>
+        </kanban>
+    </field>
+</record>
+
+<!-- Vista Tree para Gestión de Riesgos - LIMPIA Y CORREGIDA -->
+<record id="view_risk_management_tree" model="ir.ui.view">
+    <field name="name">risk.management.tree</field>
+    <field name="model">risk.management</field>
+    <field name="arch" type="xml">
+        <tree string="Gestión de Riesgos">
+            <field name="request_number" string="Código"/>
+            <field name="title" string="Nombre"/>
+            <field name="create_date" string="Fecha de Creación"/>
+            <field name="inherent_risk_level" string="Riesgo Inherente" widget="badge"
+                   decoration-success="inherent_risk_level == 'low'"
+                   decoration-warning="inherent_risk_level == 'medium'"
+                   decoration-danger="inherent_risk_level in ('high', 'critical')"/>
+            <field name="residual_risk_level" string="Riesgo Residual" widget="badge"
+                   decoration-success="residual_risk_level == 'low'"
+                   decoration-warning="residual_risk_level == 'medium'"
+                   decoration-danger="residual_risk_level in ('high', 'critical')"/>
+            <field name="department_id" string="Departamento"/>
+            <field name="responsible_id" string="Responsable"/>
+        </tree>
+    </field>
+</record>
+
+<!-- Vista Form para Gestión de Riesgos - TIPO COMO SELECT -->
+<record id="view_risk_management_form" model="ir.ui.view">
+    <field name="name">risk.management.form</field>
+    <field name="model">risk.management</field>
+    <field name="arch" type="xml">
+        <form string="Gestión de Riesgo">
+            <sheet>
+                    <div class="oe_button_box" name="button_box">
+                            <button type="object" 
+                                    name="action_view_evaluation_plans" 
+                                    class="oe_stat_button" 
+                                    icon="fa-tasks">
+                                <field string="Planes" name="evaluation_plan_count" widget="statinfo"/>
+                            </button>
+                        </div>
+                <div class="oe_title">
+                    <h1>
+                        <field name="request_number" readonly="1"/>
+                    </h1>
+                    <div class="oe_edit_only">
+                        <label for="title"/>
+                    </div>
+                    <h2>
+                        <field name="title" placeholder="Título del riesgo..."/>
+                    </h2>
+                </div>
+                
+                <!-- Información básica -->
+                <group>
+                    <group>
+                        <field name="risk_type" 
+                               readonly="request_number != 'Nuevo'"
+                               placeholder="Seleccione el tipo de gestión"/>
+                        <field name="category_id" options="{'no_create': True}"/>
+                        <field name="department_id" options="{'no_create': True}"/>
+                        <field name="identification_date"/>
+                        <field name="created_by" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="responsible_id" options="{'no_create': True}"/>
+                        <field name="priority" readonly="1"/>
+                        <field name="risk_level" readonly="1"/>
+                    </group>
+                </group>
+                
+                <!-- Descripción -->
+                <group>
+                    <field name="description" nolabel="2" placeholder="Descripción detallada del riesgo..."/>
+                </group>
+                
+                <!-- Evaluación de riesgo -->
+                <group string="Evaluación de Riesgo">
+                    <group>
+                        <field name="probability"/>
+                        <field name="impact"/>
+                    </group>
+                    <group>
+                        <field name="risk_score" readonly="1" widget="progressbar"/>
+                        <field name="risk_level" readonly="1" widget="badge"
+                            decoration-success="risk_level == 'low'"
+                            decoration-warning="risk_level == 'medium'"
+                            decoration-danger="risk_level in ('high', 'critical')"/>
+                    </group>
+                </group>
+                
+                <!-- Notebook con información adicional -->
+                <notebook>
+                    <page string="Análisis de Riesgo">
+                        <!-- MATRIZ DE RIESGO VISUAL -->
+                        <group string="Matriz de Riesgo Visual">
+                            <field name="matriz_visual" widget="html" nolabel="2"/>
+                        </group>
+                        
+                        <separator/>
+                        
+                        <!-- Análisis de riesgo inherente y residual -->
+                        <group>
+                            <group string="Riesgo Inherente">
+                                <field name="inherent_risk_level" readonly="1" widget="badge"
+                                        decoration-success="inherent_risk_level == 'low'"
+                                        decoration-warning="inherent_risk_level == 'medium'"
+                                        decoration-danger="inherent_risk_level in ('high', 'critical')"/>
+                                <field name="inherent_risk" nolabel="1"/>
+                            </group>
+                            <group string="Riesgo Residual">
+                                <field name="residual_risk_level" widget="badge"
+                                        decoration-success="residual_risk_level == 'low'"
+                                        decoration-warning="residual_risk_level == 'medium'"
+                                        decoration-danger="residual_risk_level in ('high', 'critical')"/>
+                                <field name="residual_risk" nolabel="1"/>
+                            </group>
+                        </group>
+                    </page>
+                    
+                    <page string="Información del Sistema">
+                        <group>
+                            <group>
+                                <field name="create_date" readonly="1"/>
+                                <field name="create_uid" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="write_date" readonly="1"/>
+                                <field name="write_uid" readonly="1"/>
+                            </group>
+                        </group>
+                    </page>
+                </notebook>
+            </sheet>
+            
+            <!-- Chatter para seguimiento -->
+            <div class="oe_chatter">
+                <field name="message_follower_ids" widget="mail_followers"/>
+                <field name="activity_ids" widget="mail_activity"/>
+                <field name="message_ids" widget="mail_thread"/>
+            </div>
+        </form>
+    </field>
+</record>
+
+ <!-- Vista Search para Gestión de Riesgos - CON FILTROS DE TIPO -->
+<record id="view_risk_management_search" model="ir.ui.view">
+    <field name="name">risk.management.search</field>
+    <field name="model">risk.management</field>
+    <field name="arch" type="xml">
+        <search string="Buscar Riesgos">
+            <field name="request_number" string="Número"/>
+            <field name="title" string="Título"/>
+            <field name="description" string="Descripción"/>
+            <field name="category_id" string="Categoría"/>
+            <field name="department_id" string="Departamento"/>
+            <field name="responsible_id" string="Responsable"/>
+            <field name="risk_type" string="Tipo"/>
+            
+            <!-- Filtros predefinidos -->
+            <filter string="Mis Riesgos" name="my_risks" 
+                    domain="[('responsible_id', '=', uid)]"/>
+            <filter string="Creados por mí" name="created_by_me" 
+                    domain="[('created_by', '=', uid)]"/>
+            
+            <separator/>
+            
+            <!-- Filtros por tipo -->
+            <filter string="ISMS - Seguridad Información" name="isms_type" 
+                    domain="[('risk_type', '=', 'ISMS')]"/>
+            <filter string="COMP - Cumplimiento" name="comp_type" 
+                    domain="[('risk_type', '=', 'COMP')]"/>
+            <filter string="ORM - Operacionales" name="orm_type" 
+                    domain="[('risk_type', '=', 'ORM')]"/>
+            
+            <separator/>
+            
+            <!-- Filtros por nivel de riesgo -->
+             <filter string="Riesgo Crítico" name="critical_risk" 
+                    domain="[('risk_level', '=', 'critical')]"/>
+            <filter string="Riesgo Alto" name="high_risk" 
+                    domain="[('risk_level', '=', 'high')]"/>
+            <filter string="Riesgo Medio" name="medium_risk" 
+                    domain="[('risk_level', '=', 'medium')]"/>
+            <filter string="Riesgo Bajo" name="low_risk" 
+                    domain="[('risk_level', '=', 'low')]"/>
+            
+            <separator/>
+            
+            <!-- Filtros por prioridad -->
+            <filter string="Prioridad Crítica" name="critical_priority" 
+                    domain="[('priority', '=', 'critical')]"/>
+            <filter string="Prioridad Alta" name="high_priority" 
+                    domain="[('priority', '=', 'high')]"/>
+            
+            <!-- Agrupaciones -->
+            <group expand="0" string="Agrupar por">
+                <filter string="Tipo" name="group_by_type" context="{'group_by': 'risk_type'}"/>
+                <filter string="Departamento" name="group_by_department" context="{'group_by': 'department_id'}"/>
+                <filter string="Categoría" name="group_by_category" context="{'group_by': 'category_id'}"/>
+                <filter string="Nivel de Riesgo" name="group_by_risk_level" context="{'group_by': 'risk_level'}"/>
+                <filter string="Responsable" name="group_by_responsible" context="{'group_by': 'responsible_id'}"/>
+                <filter string="Prioridad" name="group_by_priority" context="{'group_by': 'priority'}"/>
+                <filter string="Fecha de Identificación" name="group_by_date" context="{'group_by': 'identification_date'}"/>
+            </group>
+        </search>
+    </field>
+</record>
+
+        <!-- Vista Graph para Análisis de Riesgos -->
+        <record id="view_risk_management_graph" model="ir.ui.view">
+            <field name="name">risk.management.graph</field>
+            <field name="model">risk.management</field>
+            <field name="arch" type="xml">
+                <graph string="Análisis de Riesgos" type="bar" stacked="0">
+                    <field name="probability" type="row"/>
+                    <field name="impact" type="col"/>
+                    <field name="risk_score" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
+        <!-- Vista Pivot para Análisis Detallado -->
+        <record id="view_risk_management_pivot" model="ir.ui.view">
+            <field name="name">risk.management.pivot</field>
+            <field name="model">risk.management</field>
+            <field name="arch" type="xml">
+                <pivot string="Análisis Detallado de Riesgos">
+                    <field name="category_id" type="row"/>
+                    <field name="risk_level" type="col"/>
+                    <field name="risk_score" type="measure"/>
+                    <field name="probability" type="measure"/>
+                    <field name="impact" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <!-- Acción específica para Gráficos y Análisis -->
+        <record id="action_risk_management_graph" model="ir.actions.act_window">
+            <field name="name">Análisis de Riesgos</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">risk.management</field>
+            <field name="view_mode">graph,pivot</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    ¡No hay datos para analizar!
+                </p>
+                <p>
+                    Los gráficos de análisis mostrarán estadísticas de los riesgos registrados.
+                    Registra algunos riesgos para ver análisis de probabilidad e impacto.
+                </p>
+            </field>
+        </record>
+
+        <!-- Acción de Ventana para Gestión de Riesgos -->
+
+<!-- Acción de Ventana para Gestión de Riesgos - CON AGRUPACIÓN AUTOMÁTICA -->
+<record id="action_risk_management" model="ir.actions.act_window">
+    <field name="name">Gestión de Riesgos</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">risk.management</field>
+    <field name="view_mode">kanban,tree,form,graph</field>
+    <field name="context">{'search_default_group_by_type': 1}</field>
+    <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">
+            ¡Registra tu primer riesgo!
+        </p>
+        <p>
+            Identifica, evalúa y gestiona los riesgos de tu empresa de manera sistemática.
+            Los riesgos se organizan automáticamente por tipo: ISMS, COMP y ORM.
+        </p>
+    </field>
+</record>
+
+    </data>
+</odoo>

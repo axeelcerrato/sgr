@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_risk_category_user,risk.category.user,model_risk_category,group_risk_user,1,0,0,0
+access_risk_category_manager,risk.category.manager,model_risk_category,group_risk_manager,1,1,1,1
+access_risk_management_user,risk.management.user,model_risk_management,group_risk_user,1,1,1,0
+access_risk_management_manager,risk.management.manager,model_risk_management,group_risk_manager,1,1,1,1
+access_evaluation_plan_user,evaluation.plan.user,model_evaluation_plan,group_risk_user,1,1,1,0
+access_evaluation_plan_manager,evaluation.plan.manager,model_evaluation_plan,group_risk_manager,1,1,1,1
+access_evaluation_plan_task_user,access_evaluation_plan_task_user,model_evaluation_plan_task,group_risk_user,1,1,1,0
+access_evaluation_plan_task_manager,access_evaluation_plan_task_manager,model_evaluation_plan_task,group_risk_manager,1,1,1,1
+access_risk_dashboard_user,access_risk_dashboard_user,model_risk_dashboard,group_risk_user,1,0,0,0
+access_risk_dashboard_manager,access_risk_dashboard_manager,model_risk_dashboard,group_risk_manager,1,1,1,1

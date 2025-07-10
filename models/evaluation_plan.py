@@ -144,6 +144,11 @@ class EvaluationPlan(models.Model):
         help='Porcentaje de progreso basado en la etapa actual'
     )
     
+    email_notifications_count = fields.Integer(
+        string='Notificaciones Enviadas',
+        compute='_compute_email_notifications'
+    )
+    
     days_to_due = fields.Integer(
         string='Días para Vencimiento',
         compute='_compute_days_to_due',
@@ -307,6 +312,37 @@ class EvaluationPlan(models.Model):
                 )
         return True
     
+    def _compute_email_notifications(self):
+        """Contar las notificaciones enviadas para este plan"""
+        for record in self:
+            record.email_notifications_count = self.env['risk.email.notification'].search_count([
+                ('plan_id', '=', record.id)
+            ])
+    
+    def action_view_email_notifications(self):
+        """Ver las notificaciones enviadas para este plan"""
+        return {
+            'type': 'ir.actions.act_window',
+            'name': f'Notificaciones - {self.title}',
+            'res_model': 'risk.email.notification',
+            'view_mode': 'tree,form',
+            'domain': [('plan_id', '=', self.id)],
+            'context': {'default_plan_id': self.id},
+        }
+        
+    def action_view_email_notifications(self):
+        """
+        Acción para ver las notificaciones enviadas para este plan
+        """
+        return {
+            'type': 'ir.actions.act_window',
+            'name': f'Notificaciones - {self.title}',
+            'res_model': 'risk.email.notification',
+            'view_mode': 'tree,form',
+            'domain': [('plan_id', '=', self.id)],
+            'context': {'default_plan_id': self.id},
+        }
+        
     def action_complete(self):
         """
         Cambia la etapa a 'Completada'

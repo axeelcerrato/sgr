@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- =============================
+             VISTAS NOTIFICACIONES EMAIL
+             ============================= -->
+        
+        <!-- Vista Tree para Notificaciones -->
+        <record id="view_risk_email_notification_tree" model="ir.ui.view">
+            <field name="name">risk.email.notification.tree</field>
+            <field name="model">risk.email.notification</field>
+            <field name="arch" type="xml">
+                <tree string="Notificaciones por Correo" decoration-success="state == 'sent'" decoration-danger="state == 'failed'">
+                    <field name="sent_date"/>
+                    <field name="notification_type"/>
+                    <field name="name"/>
+                    <field name="risk_id"/>
+                    <field name="plan_id"/>
+                    <field name="recipients"/>
+                    <field name="state" widget="badge" 
+                           decoration-success="state == 'sent'" 
+                           decoration-danger="state == 'failed'"
+                           decoration-info="state == 'draft'"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Vista Form para Notificaciones -->
+        <record id="view_risk_email_notification_form" model="ir.ui.view">
+            <field name="name">risk.email.notification.form</field>
+            <field name="model">risk.email.notification</field>
+            <field name="arch" type="xml">
+                <form string="Notificación por Correo" create="false" edit="false">
+                    <header>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,sent,failed"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="notification_type"/>
+                                <field name="sent_date"/>
+                                <field name="state"/>
+                            </group>
+                            <group>
+                                <field name="risk_id"/>
+                                <field name="plan_id"/>
+                                <field name="mail_message_id"/>
+                            </group>
+                        </group>
+                        
+                        <group string="Destinatarios">
+                            <field name="recipients" nolabel="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Vista Search para Notificaciones -->
+        <record id="view_risk_email_notification_search" model="ir.ui.view">
+            <field name="name">risk.email.notification.search</field>
+            <field name="model">risk.email.notification</field>
+            <field name="arch" type="xml">
+                <search string="Buscar Notificaciones">
+                    <field name="name"/>
+                    <field name="notification_type"/>
+                    <field name="risk_id"/>
+                    <field name="plan_id"/>
+                    <field name="recipients"/>
+                    
+                    <filter string="Enviadas" name="sent" domain="[('state', '=', 'sent')]"/>
+                    <filter string="Fallidas" name="failed" domain="[('state', '=', 'failed')]"/>
+                    <filter string="Riesgo Crítico" name="critical_risk" domain="[('notification_type', '=', 'critical_risk')]"/>
+                    <filter string="Plan Vencido" name="plan_overdue" domain="[('notification_type', '=', 'plan_overdue')]"/>
+                    
+                    <filter string="Hoy" name="today" domain="[('sent_date', '>=', context_today())]"/>
+                    <filter string="Esta Semana" name="this_week" domain="[('sent_date', '>=', (context_today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                    
+                    <group expand="0" string="Agrupar por">
+                        <filter string="Tipo" name="group_by_type" context="{'group_by': 'notification_type'}"/>
+                        <filter string="Estado" name="group_by_state" context="{'group_by': 'state'}"/>
+                        <filter string="Fecha" name="group_by_date" context="{'group_by': 'sent_date'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Acción para Notificaciones -->
+        <record id="action_risk_email_notification" model="ir.actions.act_window">
+            <field name="name">Notificaciones por Correo</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">risk.email.notification</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'search_default_sent': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    ¡No hay notificaciones registradas!
+                </p>
+                <p>
+                    Las notificaciones automáticas por correo aparecerán aquí cuando se envíen.
+                </p>
+            </field>
+        </record>
+
+        <!-- =============================
+             CRON JOB - PLANES VENCIDOS
+             ============================= -->
+        <record id="cron_check_overdue_plans" model="ir.cron">
+            <field name="name">Verificar Planes de Acción Vencidos</field>
+            <field name="model_id" ref="model_evaluation_plan"/>
+            <field name="type">ir.cron</field>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active">True</field>
+            <field name="code">model.check_overdue_plans()</field>
+            <field name="nextcall" eval="(DateTime.now() + timedelta(hours=8)).strftime('%Y-%m-%d 08:00:00')"/>
+        </record>
+
+        <!-- =============================
+             BOTONES EN VISTAS EXISTENTES - CORREGIDO
+             ============================= -->
+        
+        <!-- Botón en vista de Riesgo - CON PREFIJO CORRECTO -->
+        <record id="view_risk_management_form_email_button" model="ir.ui.view">
+            <field name="name">risk.management.form.email.button</field>
+            <field name="model">risk.management</field>
+            <field name="inherit_id" ref="sgr.view_risk_management_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button type="object"
+                            name="action_view_email_notifications"
+                            class="oe_stat_button"
+                            icon="fa-envelope">
+                        <field string="Correos" name="email_notifications_count" widget="statinfo"/>
+                    </button>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Botón en vista de Plan - CON PREFIJO CORRECTO -->
+        <record id="view_evaluation_plan_form_email_button" model="ir.ui.view">
+            <field name="name">evaluation.plan.form.email.button</field>
+            <field name="model">evaluation.plan</field>
+            <field name="inherit_id" ref="sgr.view_evaluation_plan_form"/>
+            <field name="arch" type="xml">
+                <!-- OPCIÓN 1: Agregar después del header -->
+                <xpath expr="//header" position="after">
+                    <div class="oe_button_box" name="button_box">
+                        <button type="object"
+                                name="action_view_email_notifications"
+                                class="oe_stat_button"
+                                icon="fa-envelope"
+                                invisible="email_notifications_count == 0">
+                            <field string="Correos" name="email_notifications_count" widget="statinfo"/>
+                        </button>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+
+        <!-- =============================
+             ACCIONES MANUALES
+             ============================= -->
+        
+        <!-- Acción para enviar correo crítico manualmente -->
+        <record id="action_send_critical_risk_email" model="ir.actions.server">
+            <field name="name">📧 Enviar Alerta de Riesgo Crítico</field>
+            <field name="model_id" ref="model_risk_management"/>
+            <field name="binding_model_id" ref="model_risk_management"/>
+            <field name="binding_type">action</field>
+            <field name="state">code</field>
+            <field name="code">
+for record in records:
+    if record.risk_level == 'critical':
+        record.send_critical_risk_notification()
+    else:
+        raise UserError('Solo se pueden enviar alertas para riesgos críticos.')
+            </field>
+        </record>
+
+        <!-- Acción para enviar correo plan vencido manualmente -->
+        <record id="action_send_plan_overdue_email" model="ir.actions.server">
+            <field name="name">📧 Enviar Alerta de Plan Vencido</field>
+            <field name="model_id" ref="model_evaluation_plan"/>
+            <field name="binding_model_id" ref="model_evaluation_plan"/>
+            <field name="binding_type">action</field>
+            <field name="state">code</field>
+            <field name="code">
+for record in records:
+    if record.is_overdue and record.stage != 'completed':
+        record.send_overdue_plan_notification()
+    else:
+        raise UserError('Solo se pueden enviar alertas para planes vencidos.')
+            </field>
+        </record>
+
+    </data>
+</odoo>

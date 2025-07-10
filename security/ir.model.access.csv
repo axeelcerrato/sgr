@@ -11,3 +11,5 @@ access_risk_dashboard_user,access_risk_dashboard_user,model_risk_dashboard,group
 access_risk_dashboard_manager,access_risk_dashboard_manager,model_risk_dashboard,group_risk_manager,1,1,1,1
 access_risk_report_wizard_user,risk.report.wizard.user,model_risk_report_wizard,group_risk_user,1,1,1,1
 access_risk_report_wizard_manager,risk.report.wizard.manager,model_risk_report_wizard,group_risk_manager,1,1,1,1
+access_risk_email_notification_manager,risk.email.notification.manager,model_risk_email_notification,group_risk_manager,1,1,1,1
+access_risk_email_notification_user,risk.email.notification.user,model_risk_email_notification,group_risk_user,1,0,0,0

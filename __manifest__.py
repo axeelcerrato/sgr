@@ -59,6 +59,8 @@
         # =============================
         'data/risk_sequence.xml',
         'data/demo_data.xml',
+        'data/email_templates.xml',
+        
         
         # =============================
         # 3. VISTAS DE MODELOS
@@ -81,8 +83,11 @@
         'reports/risk_report_dynamic_action.xml',
         'reports/risk_report_dynamic_template.xml',
         
+        # 6. EMAIL CRON (DESPUÉS DE LAS VISTAS)
+        'data/email_cron.xml',  # <-- MOVER AQUÍ
+        
         # =============================
-        # 6. MENÚS (Siempre al final)
+        # 7. MENÚS (Siempre al final)
         # =============================
         'views/risk_menu.xml',
     ],

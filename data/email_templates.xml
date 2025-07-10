@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <record id="email_template_critical_risk" model="mail.template">
+            <field name="name">Riesgo Crítico Identificado</field>
+            <field name="model_id" ref="model_risk_management"/>
+            <field name="subject">RIESGO CRÍTICO IDENTIFICADO - ${object.request_number}</field>
+            <field name="email_from">${(object.company_id.email or user.email)|safe}</field>
+            <field name="use_default_to">True</field>
+            <field name="body_html">
+                &lt;h2&gt;RIESGO CRÍTICO IDENTIFICADO&lt;/h2&gt;
+                &lt;p&gt;Este riesgo ha sido clasificado como CRÍTICO y requiere acción inmediata.&lt;/p&gt;
+                &lt;p&gt;&lt;strong&gt;Código:&lt;/strong&gt; ${object.request_number}&lt;/p&gt;
+                &lt;p&gt;&lt;strong&gt;Título:&lt;/strong&gt; ${object.title}&lt;/p&gt;
+                &lt;p&gt;&lt;strong&gt;Responsable:&lt;/strong&gt; ${object.responsible_id.name}&lt;/p&gt;
+                &lt;p&gt;&lt;strong&gt;Departamento:&lt;/strong&gt; ${object.department_id.name}&lt;/p&gt;
+                &lt;p&gt;&lt;strong&gt;Puntuación:&lt;/strong&gt; ${object.risk_score}%&lt;/p&gt;
+            </field>
+        </record>
+
+        <record id="email_template_plan_overdue" model="mail.template">
+            <field name="name">Plan de Acción Vencido</field>
+            <field name="model_id" ref="model_evaluation_plan"/>
+            <field name="subject">PLAN DE ACCIÓN VENCIDO - ${object.title}</field>
+            <field name="email_from">${(object.company_id.email or user.email)|safe}</field>
+            <field name="use_default_to">True</field>
+            <field name="body_html">
+                &lt;h2&gt;PLAN DE ACCIÓN VENCIDO&lt;/h2&gt;
+                &lt;p&gt;Este plan de acción ha vencido y requiere atención inmediata.&lt;/p&gt;
+                &lt;p&gt;&lt;strong&gt;Plan:&lt;/strong&gt; ${object.title}&lt;/p&gt;
+                &lt;p&gt;&lt;strong&gt;Responsable:&lt;/strong&gt; ${object.assigned_to.name}&lt;/p&gt;
+                &lt;p&gt;&lt;strong&gt;Fecha Límite:&lt;/strong&gt; ${object.due_date}&lt;/p&gt;
+                &lt;p&gt;&lt;strong&gt;Progreso:&lt;/strong&gt; ${object.progress}%&lt;/p&gt;
+                &lt;p&gt;&lt;strong&gt;Riesgo Relacionado:&lt;/strong&gt; ${object.risk_id.title}&lt;/p&gt;
+            </field>
+        </record>
+
+    </data>
+</odoo>

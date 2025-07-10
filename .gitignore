@@ -1,6 +1,6 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
-*.py[codz]
+*.py[cod]
 *$py.class
 
 # C extensions
@@ -205,3 +205,67 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# ===================================
+# Odoo specific files and directories
+# ===================================
+
+# Odoo compiled files
+*.pyc
+*.pyo
+
+# Odoo runtime directories
+filestore/
+sessions/
+
+# Odoo backups
+addons/*/static/description/icon.png.backup
+
+# Odoo configuration files
+odoo.conf
+*.conf
+
+# Backup files
+*.bak
+*.backup
+
+# Temporary files
+*.tmp
+*.temp
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+desktop.ini
+
+# Linux
+*~
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Node modules (if using JS/CSS build tools)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Compiled CSS/JS
+*.min.css
+*.min.js
+
+# Package files
+*.tar.gz
+*.zip
+*.rar
+
+# Documentation build
+_build/
+_static/
+_templates/

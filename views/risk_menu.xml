@@ -8,8 +8,7 @@
                   name="Gestión de Riesgos" 
                   sequence="10"/>
         
-        <!-- DASHBOARD - NUEVO -->
-   
+        <!-- DASHBOARD -->
         <menuitem id="menu_risk_dashboard" 
           name="Dashboard" 
           parent="menu_risk_management_root"
@@ -17,8 +16,8 @@
           sequence="1"/>
         
         <!-- ============================
-                             SUBMENÚ: RIESGOS
-        ============================= -->
+             SUBMENÚ: RIESGOS
+             ============================= -->
         <menuitem id="menu_risk_management_risks" 
                   name="Riesgos" 
                   parent="menu_risk_management_root" 
@@ -50,7 +49,7 @@
         </record>
         
         <!-- =============================
-             SUBMENÚ: PLAN DE EVALUACIÓN (NUEVO)
+             SUBMENÚ: PLAN DE EVALUACIÓN
              ============================= -->
         <menuitem id="menu_evaluation_plan" 
                   name="Plan de Acción" 
@@ -70,6 +69,28 @@
                   parent="menu_evaluation_plan"
                   action="action_overdue_evaluation_plan" 
                   sequence="30"/>
+        
+        <!-- =============================
+             SUBMENÚ: REPORTES (ACTIVADO)
+             ============================= -->
+        <menuitem id="menu_risk_reports" 
+                  name="Reportes" 
+                  parent="menu_risk_management_root" 
+                  sequence="80"/>
+        
+        <!-- Opción: Reporte Dinámico -->
+        <menuitem id="menu_risk_report_dynamic" 
+                  name="Reporte Dinámico" 
+                  parent="menu_risk_reports"
+                  action="action_risk_report_wizard" 
+                  sequence="10"/>
+        
+        <!-- Opción: Análisis de Riesgos (Gráficos) -->
+        <menuitem id="menu_risk_analysis" 
+                  name="Análisis de Riesgos" 
+                  parent="menu_risk_reports"
+                  action="action_risk_management_graph" 
+                  sequence="20"/>
         
         <!-- =============================
              SUBMENÚ: CONFIGURACIÓN

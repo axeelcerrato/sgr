@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- =============================
+             PLANTILLA PDF REPORTE DINÁMICO
+             ============================= -->
+        <template id="report_risk_dynamic_document">
+            <t t-call="web.external_layout">
+                <t t-foreach="docs" t-as="wizard">
+                    
+                    <!-- Obtener datos del wizard y riesgos filtrados -->
+                    <t t-set="wizard_data" t-value="context.get('wizard_data', {})"/>
+                    <t t-set="risks" t-value="wizard._get_filtered_risks()"/>
+                    <t t-set="statistics" t-value="wizard._get_report_statistics(risks)"/>
+                    
+                    <div class="page">
+                        
+                        <!-- =============================
+                             PORTADA DEL REPORTE
+                             ============================= -->
+                        <div class="text-center" style="margin-top: 100px;">
+                            <h1 style="font-size: 36px; font-weight: bold; color: #2c3e50; margin-bottom: 30px;">
+                                <t t-esc="wizard_data.get('report_title', 'Reporte de Gestión de Riesgos')"/>
+                            </h1>
+                            
+                            <div style="margin: 50px 0;">
+                                <h3 style="color: #7f8c8d;">
+                                    Período: <span t-esc="wizard_data.get('date_from')"/> - <span t-esc="wizard_data.get('date_to')"/>
+                                </h3>
+                            </div>
+                            
+                            <div style="margin: 50px 0;">
+                                <h2 style="color: #3498db;">
+                                    <span t-esc="statistics['total_risks']"/> Riesgos Analizados
+                                </h2>
+                            </div>
+                            
+                            <div style="margin-top: 100px; color: #95a5a6;">
+                                <p style="font-size: 18px;">
+                                    Generado el <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y')"/>
+                                </p>
+                                <p style="font-size: 16px;">
+                                    Por: <span t-esc="user.name"/>
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Salto de página -->
+                        <p style="page-break-before: always;"/>
+                        
+                        <!-- =============================
+                             RESUMEN EJECUTIVO
+                             ============================= -->
+                        <div t-if="wizard_data.get('include_summary', True)">
+                            
+                            <h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">
+                                📊 RESUMEN EJECUTIVO
+                            </h2>
+                            
+                            <!-- KPIs Principales -->
+                            <div class="row" style="margin: 30px 0;">
+                                <div class="col-3 text-center" style="padding: 20px; background: #ecf0f1; border-radius: 8px; margin: 5px;">
+                                    <h3 style="color: #e74c3c; margin: 0;"><span t-esc="statistics['critical_risks']"/></h3>
+                                    <p style="margin: 5px 0;"><strong>Riesgos Críticos</strong></p>
+                                    <small><span t-esc="statistics['critical_percentage']"/>% del total</small>
+                                </div>
+                                <div class="col-3 text-center" style="padding: 20px; background: #ecf0f1; border-radius: 8px; margin: 5px;">
+                                    <h3 style="color: #f39c12; margin: 0;"><span t-esc="statistics['high_risks']"/></h3>
+                                    <p style="margin: 5px 0;"><strong>Riesgos Altos</strong></p>
+                                    <small><span t-esc="statistics['high_percentage']"/>% del total</small>
+                                </div>
+                                <div class="col-3 text-center" style="padding: 20px; background: #ecf0f1; border-radius: 8px; margin: 5px;">
+                                    <h3 style="color: #27ae60; margin: 0;"><span t-esc="statistics['total_plans']"/></h3>
+                                    <p style="margin: 5px 0;"><strong>Planes de Acción</strong></p>
+                                    <small><span t-esc="statistics['completion_rate']"/>% completados</small>
+                                </div>
+                                <div class="col-3 text-center" style="padding: 20px; background: #ecf0f1; border-radius: 8px; margin: 5px;">
+                                    <h3 style="color: #3498db; margin: 0;"><span t-esc="statistics['total_risks']"/></h3>
+                                    <p style="margin: 5px 0;"><strong>Total Riesgos</strong></p>
+                                    <small>En el período</small>
+                                </div>
+                            </div>
+                            
+                            <!-- Distribución por Tipo -->
+                            <h4 style="color: #34495e; margin-top: 40px;">Distribución por Tipo de Gestión</h4>
+                            <table class="table table-borderless" style="margin: 20px 0;">
+                                <tbody>
+                                    <tr>
+                                        <td style="width: 30%; font-weight: bold;">
+                                            <i class="fa fa-shield"/> ISMS (Seguridad de Información):
+                                        </td>
+                                        <td style="width: 15%; text-align: center;">
+                                            <span style="font-size: 20px; font-weight: bold; color: #3498db;">
+                                                <span t-esc="statistics['isms_risks']"/>
+                                            </span>
+                                        </td>
+                                        <td style="width: 55%;">
+                                            <div style="background: #ecf0f1; height: 20px; border-radius: 10px; overflow: hidden;">
+                                                <div style="background: #3498db; height: 100%; border-radius: 10px;"
+                                                     t-attf-style="width: #{(statistics['isms_risks'] / statistics['total_risks'] * 100) if statistics['total_risks'] > 0 else 0}%;"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: bold;">
+                                            <i class="fa fa-legal"/> COMP (Cumplimiento):
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <span style="font-size: 20px; font-weight: bold; color: #f39c12;">
+                                                <span t-esc="statistics['comp_risks']"/>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div style="background: #ecf0f1; height: 20px; border-radius: 10px; overflow: hidden;">
+                                                <div style="background: #f39c12; height: 100%; border-radius: 10px;"
+                                                     t-attf-style="width: #{(statistics['comp_risks'] / statistics['total_risks'] * 100) if statistics['total_risks'] > 0 else 0}%;"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: bold;">
+                                            <i class="fa fa-cogs"/> ORM (Operacionales):
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <span style="font-size: 20px; font-weight: bold; color: #27ae60;">
+                                                <span t-esc="statistics['orm_risks']"/>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div style="background: #ecf0f1; height: 20px; border-radius: 10px; overflow: hidden;">
+                                                <div style="background: #27ae60; height: 100%; border-radius: 10px;"
+                                                     t-attf-style="width: #{(statistics['orm_risks'] / statistics['total_risks'] * 100) if statistics['total_risks'] > 0 else 0}%;"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                        </div>
+                        
+                        <!-- =============================
+                             DETALLE DE RIESGOS
+                             ============================= -->
+                        <div t-if="wizard_data.get('include_risk_details', True) and len(risks) > 0">
+                            
+                            <!-- Salto de página -->
+                            <p style="page-break-before: always;"/>
+                            
+                            <h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">
+                                📋 DETALLE DE RIESGOS
+                            </h2>
+                            
+                            <!-- Tabla de riesgos -->
+                            <table class="table table-bordered" style="margin: 20px 0;">
+                                <thead style="background: #ecf0f1;">
+                                    <tr>
+                                        <th style="width: 15%;">Código</th>
+                                        <th style="width: 35%;">Título</th>
+                                        <th style="width: 15%;">Tipo</th>
+                                        <th style="width: 10%;">Nivel</th>
+                                        <th style="width: 15%;">Responsable</th>
+                                        <th style="width: 10%;">Fecha</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="risks" t-as="risk">
+                                        <tr>
+                                            <td style="font-weight: bold;">
+                                                <span t-field="risk.request_number"/>
+                                            </td>
+                                            <td>
+                                                <span t-field="risk.title"/>
+                                            </td>
+                                            <td>
+                                                <span t-field="risk.risk_type"/>
+                                            </td>
+                                            <td>
+                                                <span class="badge"
+                                                      t-attf-style="background: #{risk.risk_level == 'critical' and '#e74c3c' or (risk.risk_level == 'high' and '#e67e22' or (risk.risk_level == 'medium' and '#f39c12' or '#27ae60'))}; color: white; padding: 4px 8px; border-radius: 4px;">
+                                                    <t t-if="risk.risk_level == 'low'">Bajo</t>
+                                                    <t t-elif="risk.risk_level == 'medium'">Medio</t>
+                                                    <t t-elif="risk.risk_level == 'high'">Alto</t>
+                                                    <t t-elif="risk.risk_level == 'critical'">Crítico</t>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span t-field="risk.responsible_id.name"/>
+                                            </td>
+                                            <td>
+                                                <span t-field="risk.identification_date"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                            
+                        </div>
+                        
+                        <!-- =============================
+                             PIE DEL REPORTE
+                             ============================= -->
+                        <div style="margin-top: 50px; text-align: center; color: #7f8c8d; border-top: 1px solid #bdc3c7; padding-top: 20px;">
+                            <p>
+                                <strong>Reporte generado automáticamente por el Sistema de Gestión de Riesgos</strong><br/>
+                                Fecha de generación: <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y a las %H:%M')"/><br/>
+                                Usuario: <span t-esc="user.name"/> | Empresa: <span t-esc="user.company_id.name"/>
+                            </p>
+                        </div>
+                        
+                    </div>
+                </t>
+            </t>
+        </template>
+
+        <!-- =============================
+             PLANTILLA PRINCIPAL
+             ============================= -->
+        <template id="report_risk_dynamic">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="sgr.report_risk_dynamic_document"/>
+                </t>
+            </t>
+        </template>
+
+    </data>
+</odoo>

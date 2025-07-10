@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- Vista Form del Wizard de Reporte Dinámico -->
+        <record id="view_risk_report_wizard_form" model="ir.ui.view">
+            <field name="name">risk.report.wizard.form</field>
+            <field name="model">risk.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Generador de Reportes de Riesgos">
+                    
+                    <!-- Encabezado con información -->
+                    <div class="alert alert-info" role="alert">
+                        <h4><i class="fa fa-info-circle"/> Generador de Reportes Dinámicos</h4>
+                        <p>Configure los filtros y opciones para generar un reporte personalizado de gestión de riesgos.</p>
+                        <p><strong>Riesgos estimados con filtros actuales: <field name="estimated_risks" readonly="1"/> registros</strong></p>
+                    </div>
+
+                    <sheet>
+                        <!-- Título del reporte -->
+                        <group>
+                            <field name="report_title" style="font-size: 16px; font-weight: bold;"/>
+                        </group>
+
+                        <!-- Notebook con diferentes secciones -->
+                        <notebook>
+                            
+                            <!-- ===== PESTAÑA: FILTROS PRINCIPALES ===== -->
+                            <page string="🔍 Filtros Principales" name="main_filters">
+                                
+                                <!-- Filtros de fechas -->
+                                <group string="📅 Período de Análisis">
+                                    <group>
+                                        <field name="date_from"/>
+                                        <field name="date_to"/>
+                                    </group>
+                                </group>
+                                
+                                <!-- Filtros de tipos de riesgo -->
+                                <group string="🏷️ Tipos de Gestión de Riesgo">
+                                    <group>
+                                        <field name="include_isms"/>
+                                        <field name="include_comp"/>
+                                    </group>
+                                    <group>
+                                        <field name="include_orm"/>
+                                    </group>
+                                </group>
+                                
+                                <!-- Filtros de niveles de riesgo -->
+                                <!-- Filtros de niveles de riesgo -->
+                                <group string="⚠️ Niveles de Riesgo a Incluir">
+                                    <group>
+                                        <field name="include_critical"/>
+                                        <field name="include_high"/>
+                                    </group>
+                                    <group>
+                                        <field name="include_medium"/>
+                                        <field name="include_low"/>
+                                    </group>
+                                </group>
+                                
+                            </page>
+                            
+                            <!-- ===== PESTAÑA: FILTROS ESPECÍFICOS ===== -->
+                            <page string="🎯 Filtros Específicos" name="specific_filters">
+                                
+                                <group>
+                                    <group string="📂 Filtrar por Categorías">
+                                        <field name="category_ids" widget="many2many_tags" 
+                                               placeholder="Seleccionar categorías específicas (vacío = todas)"/>
+                                    </group>
+                                    
+                                    <group string="🏢 Filtrar por Departamentos">
+                                        <field name="department_ids" widget="many2many_tags"
+                                               placeholder="Seleccionar departamentos específicos (vacío = todos)"/>
+                                    </group>
+                                </group>
+                                
+                                <group>
+                                    <group string="👥 Filtrar por Responsables">
+                                        <field name="responsible_ids" widget="many2many_tags"
+                                               placeholder="Seleccionar responsables específicos (vacío = todos)"/>
+                                    </group>
+                                </group>
+                                
+                            </page>
+                            
+                            <!-- ===== PESTAÑA: CONTENIDO DEL REPORTE ===== -->
+                            <page string="📋 Contenido del Reporte" name="content_options">
+                                
+                                <group string="📊 Secciones a Incluir">
+                                    <group>
+                                        <field name="include_summary"/>
+                                        <field name="include_matrix"/>
+                                        <field name="include_risk_details"/>
+                                    </group>
+                                    <group>
+                                        <field name="include_charts"/>
+                                        <field name="include_action_plans"/>
+                                        <field name="include_methodology"/>
+                                    </group>
+                                </group>
+                                
+                                <group string="🔄 Organización de los Datos">
+                                    <group>
+                                        <field name="group_by_type"/>
+                                        <field name="group_by_category"/>
+                                    </group>
+                                    <group>
+                                        <field name="sort_by_risk_level"/>
+                                    </group>
+                                </group>
+                                
+                            </page>
+                            
+                            <!-- ===== PESTAÑA: VISTA PREVIA ===== -->
+                            <page string="👁️ Vista Previa" name="preview">
+                                
+                                <div class="alert alert-warning" role="alert" invisible="estimated_risks > 0">
+                                    <h4><i class="fa fa-exclamation-triangle"/> Sin Datos</h4>
+                                    <p>No hay riesgos que coincidan con los filtros seleccionados. Ajuste los criterios para generar el reporte.</p>
+                                </div>
+                                
+                                <div invisible="estimated_risks == 0">
+                                    <group string="📈 Resumen de Datos">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="alert alert-success text-center" style="margin: 10px;">
+                                                    <h3><field name="estimated_risks" readonly="1"/></h3>
+                                                    <p><strong>Riesgos Total</strong></p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="alert alert-info text-center" style="margin: 10px;">
+                                                    <h3>N/A</h3>
+                                                    <p><strong>Días del Período</strong></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </group>
+                                    
+                                    <group>
+                                        <div class="text-center">
+                                            <button name="action_preview_data" type="object" 
+                                                    string="📊 Previsualizar Datos" 
+                                                    class="btn-info"
+                                                    help="Ver los riesgos que se incluirán en el reporte"/>
+                                        </div>
+                                    </group>
+                                </div>
+                                
+                            </page>
+                            
+                        </notebook>
+                    </sheet>
+                    
+                    <!-- Pie del formulario con botones de acción -->
+                    <footer>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button name="action_reset_filters" type="object" 
+                                        string="🔄 Restablecer Filtros" 
+                                        class="btn-secondary"/>
+                            </div>
+                            <div class="col-md-6 text-right">
+                                <button name="action_generate_report" type="object" 
+                                        string="📄 Generar Reporte PDF" 
+                                        class="btn-primary"
+                                        invisible="estimated_risks == 0"/>
+                                <button string="Cancelar" special="cancel" class="btn-default"/>
+                            </div>
+                        </div>
+                    </footer>
+                    
+                </form>
+            </field>
+        </record>
+        
+        <!-- Acción para abrir el wizard -->
+        <record id="action_risk_report_wizard" model="ir.actions.act_window">
+            <field name="name">Generador de Reportes Dinámicos</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">risk.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="context">{}</field>
+        </record>
+
+    </data>
+</odoo>

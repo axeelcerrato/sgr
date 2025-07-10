@@ -13,10 +13,10 @@
         Características principales:
         * Identificación y categorización de riesgos
         * Evaluación y análisis de riesgos
-        * Matriz de riesgos visual
+        * Matriz de riesgos visual 5x5
         * Planes de evaluación y seguimiento
-        * Reportes detallados en PDF
-        * Dashboard de monitoreo
+        * Reportes dinámicos personalizables
+        * Dashboard de monitoreo en tiempo real
         * Gestión de medidas de control
         
         Funcionalidades:
@@ -24,43 +24,79 @@
         * Evaluación de probabilidad e impacto
         * Clasificación automática de riesgos
         * Seguimiento de estados y responsables
-        * Generación de reportes ejecutivos
+        * Generación de reportes ejecutivos dinámicos
+        * Wizard de reportes con filtros avanzados
         * Integración con sistema de usuarios y permisos
+        * Tipos de gestión: ISMS, COMP, ORM
+        
+        Reportes incluidos:
+        * Reporte individual de riesgo
+        * Reporte dinámico con filtros personalizables
+        * Matriz visual de riesgos
+        * Estadísticas y análisis ejecutivo
     """,
- 
+    
     'author': 'Axeel Cerrato',
-   
-    'depends': ['base', 'mail','hr'],
-    'images': '/sgr/static/description/icon.png',
+    'depends': ['base', 'mail', 'hr'],
+    'images': ['/sgr/static/description/icon.png'],
+    
     'assets': {
         'web.assets_backend': [
-           # 'sgr/static/src/css/risk_matrix.css',
+            'sgr/static/src/css/risk_matrix.css',
         ],
     },
+    
     'data': [
-        # 1. Primero la seguridad (permisos de acceso unificados)
-         'security/security_groups.xml',        
-         'security/ir.model.access.csv',        
-         'security/record_rules.xml',
-       
-        # 2. Datos base (secuencias, datos maestros)
+        # =============================
+        # 1. SEGURIDAD (Primero siempre)
+        # =============================
+        'security/security_groups.xml',
+        'security/ir.model.access.csv',
+        'security/record_rules.xml',
+        
+        # =============================
+        # 2. DATOS BASE
+        # =============================
         'data/risk_sequence.xml',
         'data/demo_data.xml',
-       
-        # 3. Vistas de los modelos
+        
+        # =============================
+        # 3. VISTAS DE MODELOS
+        # =============================
         'views/risk_category_views.xml',
         'views/risk_management_views.xml',
-        'views/dashboard_views.xml',
         'views/evaluation_plan_views.xml',
-        # 4. Reportes PDF
+        'views/dashboard_views.xml',
+        
+        # =============================
+        # 4. VISTAS DE WIZARDS
+        # =============================
+        'views/risk_report_wizard_views.xml',
+        
+        # =============================
+        # 5. REPORTES PDF
+        # =============================
         'reports/risk_report_action.xml',
         'reports/risk_report_template.xml',
-       
-        # 5. Menús
+        'reports/risk_report_dynamic_action.xml',
+        'reports/risk_report_dynamic_template.xml',
+        
+        # =============================
+        # 6. MENÚS (Siempre al final)
+        # =============================
         'views/risk_menu.xml',
-       
     ],
+    
     'installable': True,
     'application': True,
     'license': 'LGPL-3',
+    'auto_install': False,
+    
+    # Información adicional
+    'website': '',
+    'support': '',
+    
+    # Para desarrollo
+    'development_status': 'Production/Stable',
+    'maintainers': ['Axeel Cerrato'],
 }

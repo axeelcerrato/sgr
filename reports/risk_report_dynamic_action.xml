@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- =============================
+             ACCIÓN DEL REPORTE DINÁMICO
+             ============================= -->
+        <record id="action_report_risk_dynamic" model="ir.actions.report">
+            <field name="name">Reporte Dinámico de Riesgos</field>
+            <field name="model">risk.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">sgr.report_risk_dynamic</field>
+            <field name="report_file">sgr.report_risk_dynamic</field>
+            <field name="print_report_name">object.report_title.replace(' ', '_') + '_' + object.date_from.strftime('%Y%m%d') + '_' + object.date_to.strftime('%Y%m%d')</field>
+            <field name="paperformat_id" ref="base.paperformat_euro"/>
+            <field name="binding_model_id" ref="model_risk_report_wizard"/>
+            <field name="binding_type">report</field>
+        </record>
+
+    </data>
+</odoo>
